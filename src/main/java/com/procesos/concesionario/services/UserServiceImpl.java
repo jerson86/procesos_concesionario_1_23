@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.procesos.concesionario.utils.Constants.USER_NOT_FOUND;
+
 @Service
 public class UserServiceImpl implements UserService{
 
@@ -46,7 +48,7 @@ public class UserServiceImpl implements UserService{
         Optional<User> userBd = userRepository.findByEmailAndPassword(user.getEmail()
                                                                     , user.getPassword());
         if(userBd.isEmpty()){
-            throw new RuntimeException("Usuario no encontrado!");
+            throw new RuntimeException(USER_NOT_FOUND);
         }
         return jwtUtil.create(String.valueOf(userBd.get().getId()),
                                 String.valueOf(userBd.get().getEmail()));
