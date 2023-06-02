@@ -16,6 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin
 public class UserController {
     @Autowired
     private UserService userServiceImpl;
@@ -55,7 +56,7 @@ public class UserController {
     }
 
     @PutMapping(value="/{id}")
-    public ResponseEntity updateUser(@PathVariable(name="id")Long id,User user) {
+    public ResponseEntity updateUser(@PathVariable(name="id")Long id,@RequestBody User user) {
         try {
             apiResponse = new ApiResponse(Constants.REGISTER_UPDATED, userServiceImpl.updateUser(id, user));
             return new ResponseEntity(apiResponse, HttpStatus.OK);
