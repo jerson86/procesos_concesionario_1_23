@@ -2,17 +2,14 @@ package com.procesos.concesionario.controllers;
 
 import com.procesos.concesionario.models.User;
 import com.procesos.concesionario.services.UserService;
-import com.procesos.concesionario.services.UserServiceImpl;
 import com.procesos.concesionario.utils.ApiResponse;
 import com.procesos.concesionario.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.procesos.concesionario.utils.SecurityConfig;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/user")
@@ -21,8 +18,14 @@ public class UserController {
     @Autowired
     private UserService userServiceImpl;
     private ApiResponse apiResponse;
+    @Autowired
+    private SecurityConfig securityConfig;
+
     @GetMapping(value = "/{id}")
-    public ResponseEntity getById(@PathVariable(name = "id") Long id){
+    public ResponseEntity getById(@PathVariable(name = "id") Long id, @RequestHeader(name = "Authorization") String token){
+        if(!securityConfig.validateToken(token)){
+            return new ResponseEntity("Token no valido!", HttpStatus.UNAUTHORIZED);
+        }
         try{
             apiResponse = new ApiResponse(Constants.REGISTER_FOUND,userServiceImpl.getUserById(id));
             return new ResponseEntity(apiResponse, HttpStatus.OK);
@@ -44,7 +47,10 @@ public class UserController {
     }
 
     @GetMapping(value = "")
-    public ResponseEntity getAll(){
+    public ResponseEntity getAll(@RequestHeader(name = "Authorization") String token){
+        if(!securityConfig.validateToken(token)){
+            return new ResponseEntity("Token no valido!", HttpStatus.UNAUTHORIZED);
+        }
         try{
             apiResponse = new ApiResponse(Constants.REGISTERS_FOUND, userServiceImpl.allUsers());
             return new ResponseEntity(apiResponse, HttpStatus.OK);
@@ -56,7 +62,10 @@ public class UserController {
     }
 
     @PutMapping(value="/{id}")
-    public ResponseEntity updateUser(@PathVariable(name="id")Long id,@RequestBody User user) {
+    public ResponseEntity updateUser(@PathVariable(name="id")Long id,@RequestBody User user, @RequestHeader(name = "Authorization") String token) {
+        if(!securityConfig.validateToken(token)){
+            return new ResponseEntity("Token no valido!", HttpStatus.UNAUTHORIZED);
+        }
         try {
             apiResponse = new ApiResponse(Constants.REGISTER_UPDATED, userServiceImpl.updateUser(id, user));
             return new ResponseEntity(apiResponse, HttpStatus.OK);
